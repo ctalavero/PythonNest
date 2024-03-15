@@ -4,3 +4,4 @@
 /copilot/chatSessions
 .idea/
 .venv
+db.sqlite3
