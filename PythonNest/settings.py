@@ -1,15 +1,18 @@
+import environ
+import os
 from pathlib import Path
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+env = environ.Env()
+environ.Env.read_env(env_file=os.path.join(BASE_DIR, '.env'))
 
-SECRET_KEY = 'django-insecure-0mi=94)qihi%6%(gq54&yi3uhf80vp6v7-!@^gi9i0*@w#qk60'
+SECRET_KEY = env('SECRET_KEY')
 
 
-DEBUG = True
-
-ALLOWED_HOSTS = []
+DEBUG = env.bool('DEBUG')
+ALLOWED_HOSTS = ['*']
 
 
 
@@ -57,13 +60,17 @@ WSGI_APPLICATION = 'PythonNest.wsgi.application'
 
 
 
+# Налаштовуємо параметри підключення до бази даних
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': env.str('DB_NAME'),
+        'USER': env.str('DB_USER'),
+        'PASSWORD': env.str('DB_PASSWORD'),
+        'HOST': env.str('DB_HOST'),
+        'PORT': env.str('DB_PORT'),
     }
 }
-
 
 
 
