@@ -1,0 +1,18 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Success</title>
+    <link rel="stylesheet" href="{% static 'css/registration_done.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>Реєстрація успішна!</h1>
+        <p>Вітаємо! Ви успішно зареєструвалися.</p>
+        <p>Тепер ви можете <a href="{% url 'account:login' %}">увійти</a> у свій аккаунт.</p>
+    </div>
+
+</body>
+</html>

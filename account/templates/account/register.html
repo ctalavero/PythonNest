@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}Register{% endblock %}
+
+{% block cssctyle %}
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+{% endblock %}
+{% block content %}
+<section class="login-section">
+    <div class="wrapper">
+        <header>
+            <h1>Реєстрація</h1>
+            <p>Приєднуйтесь до нашої спільноти Python!</p>
+        </header>
+        <form action="{% url 'account:register' %}" method="post">
+            {% csrf_token %}
+            <div class="input-container">
+                <label for = "username">Username</label>
+                <div class="field">
+                    {% render_field form.username placeholder="Username" class="form-control" %}
+
+                </div>
+                {{ form.username.errors }}
+            </div>
+            <div class="input-container">
+                <label for = "email">Електронна пошта</label>
+                <div class="field">
+                    {% render_field form.email placeholder="Електронна пошта" class="form-control" %}
+                </div>
+                {{ form.email.errors }}
+            </div>
+            <div class="input-container">
+                <label for = "password">Пароль</label>
+                <div class="field">
+                    {% render_field form.password placeholder="Пароль" class="form-control" %}
+                </div>
+                {{ form.password.errors }}
+            </div>
+            <div class="input-container">
+                <label for = "password2">Повторіть пароль</label>
+                <div class="field">
+                    {% render_field form.password2 placeholder="Повторіть пароль" class="form-control" %}
+                </div>
+                {{ form.password2.errors }}
+            </div>
+            <input type="hidden" name="next" value="{{ next }}" />
+            <button type="submit">Зареєструвати</button>
+        </form>
+
+    </div>
+    <div class="wrapper">
+        <p class="p-center">Увійти з допомогою</p>
+        <div class="social">
+            <a href="#" class="facebook"><i class="fa-brands fa-facebook"></i></i></a>
+            <a href="#" class="google"><i class="fa-brands fa-google"></i></a>
+            <a href="#" class="twitter"><i class="fab fa-twitter"></i></a>
+        </div>
+
+        <p class="register">Вже маєте обліковий запис?<a href="{% url 'account:login' %}">Увійти</a></p>
+    </div>
+
+</section>
+{% endblock %}

@@ -2,7 +2,6 @@
 {% load static %}
 {% load widget_tweaks %}
 
-
 {% block title %}Log-in{% endblock %}
 
 {% block cssctyle %}
@@ -19,23 +18,35 @@
         <form action="{% url 'account:login' %}" method="post">
             {% csrf_token %}
             <div class="input-container">
-                <label for = "username">Логін чи пошта</label>
-                
+                <label for="username">Логін чи пошта</label>
                 <div class="field">
-                    {% render_field form.username placeholder="Логін" %}
-
+                    {% render_field form.username placeholder="Логін" class="form-control" %}
                     <i class="fa-sharp fa-solid fa-envelope"></i>
                 </div>
-                {{ form.username.errors }}
+                {% if form.username.errors %}
+                <p class="error">{{ form.username.errors }}</p>
+                {% endif %}
             </div>
             <div class="input-container">
-                <label for = "password">Пароль</label>
+                <label for="password">Пароль</label>
                 <div class="field">
-                    <input type="password" name="password" placeholder="Пароль">
+                    {% render_field form.password placeholder="Пароль" class="form-control" %}
                     <i class="fa-sharp fa-regular fa-eye"></i>
                 </div>
-
+                {% if form.password.errors %}
+                <p class="error">{{ form.password.errors }}</p>
+                {% endif %}
             </div>
+
+            {% if form.non_field_errors %}
+                <div class="non-field-errors">
+                    <ul>
+                        {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
             <div class="extra">
                 <div class="remember-me">
                     <input type="checkbox" name="remember" id="remember" class="css-checkbox">
@@ -48,19 +59,15 @@
             <input type="hidden" name="next" value="{{ next }}" />
             <button type="submit">Увійти</button>
         </form>
-        
     </div>
     <div class="wrapper">
         <p class="p-center">Увійти з допомогою</p>
         <div class="social">
-            <a href="#" class="facebook"><i class="fa-brands fa-facebook"></i></i></a>
+            <a href="#" class="facebook"><i class="fa-brands fa-facebook"></i></a>
             <a href="#" class="google"><i class="fa-brands fa-google"></i></a>
             <a href="#" class="twitter"><i class="fab fa-twitter"></i></a>
         </div>
-        
-        <p class="register">Не зареєстровані?<a href="#">Зареєструватися</a></p>
+        <p class="register">Не зареєстровані?<a href="{% url 'account:register' %}">Зареєструватися</a></p>
     </div>
-    
 </section>
 {% endblock %}
-

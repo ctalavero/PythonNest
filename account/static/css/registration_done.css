@@ -1,0 +1,33 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f9f9f9;
+    text-align: center;
+    padding: 50px;
+}
+
+h1 {
+    color: #6e5494;
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+
+p {
+    color: #888;
+    font-size: 1.2rem;
+    line-height: 1.5;
+}
+
+a {
+    color: #6e5494;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #694a91;
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+}

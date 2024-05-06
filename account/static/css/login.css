@@ -261,3 +261,16 @@ p.register a {
 p.register a:hover {
     text-decoration: underline;
 }
+
+.non-field-errors, .errorlist {
+    margin-top: 1rem; /* Додайте відступ зверху для розділення від інших елементів */
+    font-size: 0.8rem; /* Розмір шрифту */
+    margin-bottom: 1rem;
+
+}
+
+.non-field-errors li {
+    margin-bottom: 1rem; /* Відступ між окремими елементами списку */
+
+}
+
