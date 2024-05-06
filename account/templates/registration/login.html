@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+
+
+{% block title %}Log-in{% endblock %}
+
+{% block cssctyle %}
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="login-section">
+    <div class="wrapper">
+        <header>
+            <h1>Логін</h1>
+            <p>Розправляй крила і злітай у світ Python!</p>
+        </header>
+        <form action="{% url 'account:login' %}" method="post">
+            {% csrf_token %}
+            <div class="input-container">
+                <label for = "username">Логін чи пошта</label>
+                
+                <div class="field">
+                    {% render_field form.username placeholder="Логін" %}
+
+                    <i class="fa-sharp fa-solid fa-envelope"></i>
+                </div>
+                {{ form.username.errors }}
+            </div>
+            <div class="input-container">
+                <label for = "password">Пароль</label>
+                <div class="field">
+                    <input type="password" name="password" placeholder="Пароль">
+                    <i class="fa-sharp fa-regular fa-eye"></i>
+                </div>
+
+            </div>
+            <div class="extra">
+                <div class="remember-me">
+                    <input type="checkbox" name="remember" id="remember" class="css-checkbox">
+                    <label for="remember">Запам'ятати мене</label>
+                </div>
+                <div class="forgot-pass">
+                    <a href="#">Забули пароль?</a>
+                </div>
+            </div>
+            <input type="hidden" name="next" value="{{ next }}" />
+            <button type="submit">Увійти</button>
+        </form>
+        
+    </div>
+    <div class="wrapper">
+        <p class="p-center">Увійти з допомогою</p>
+        <div class="social">
+            <a href="#" class="facebook"><i class="fa-brands fa-facebook"></i></i></a>
+            <a href="#" class="google"><i class="fa-brands fa-google"></i></a>
+            <a href="#" class="twitter"><i class="fab fa-twitter"></i></a>
+        </div>
+        
+        <p class="register">Не зареєстровані?<a href="#">Зареєструватися</a></p>
+    </div>
+    
+</section>
+{% endblock %}
+
