@@ -14,7 +14,7 @@
             <h1>Реєстрація</h1>
             <p>Приєднуйтесь до нашої спільноти Python!</p>
         </header>
-        <form action="{% url 'account:register' %}" method="post">
+        <form action="{% url 'register' %}" method="post">
             {% csrf_token %}
             <div class="input-container">
                 <label for = "username">Username</label>
@@ -58,7 +58,7 @@
             <a href="#" class="twitter"><i class="fab fa-twitter"></i></a>
         </div>
 
-        <p class="register">Вже маєте обліковий запис?<a href="{% url 'account:login' %}">Увійти</a></p>
+        <p class="register">Вже маєте обліковий запис?<a href="{% url 'login' %}">Увійти</a></p>
     </div>
 
 </section>

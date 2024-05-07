@@ -15,7 +15,7 @@
             <h1>Логін</h1>
             <p>Розправляй крила і злітай у світ Python!</p>
         </header>
-        <form action="{% url 'account:login' %}" method="post">
+        <form action="{% url 'login' %}" method="post">
             {% csrf_token %}
             <div class="input-container">
                 <label for="username">Логін чи пошта</label>
@@ -53,7 +53,7 @@
                     <label for="remember">Запам'ятати мене</label>
                 </div>
                 <div class="forgot-pass">
-                    <a href="#">Забули пароль?</a>
+                    <a href="{% url 'password_reset' %}">Забули пароль?</a>
                 </div>
             </div>
             <input type="hidden" name="next" value="{{ next }}" />
@@ -67,7 +67,7 @@
             <a href="#" class="google"><i class="fa-brands fa-google"></i></a>
             <a href="#" class="twitter"><i class="fab fa-twitter"></i></a>
         </div>
-        <p class="register">Не зареєстровані?<a href="{% url 'account:register' %}">Зареєструватися</a></p>
+        <p class="register">Не зареєстровані?<a href="{% url 'register' %}">Зареєструватися</a></p>
     </div>
 </section>
 {% endblock %}
