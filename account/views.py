@@ -39,8 +39,6 @@ def register(request):
             new_user = user_form.save(commit=False)
             new_user.set_password(user_form.cleaned_data['password'])
             new_user.save()
-
-
             return render(request, 'account/register_done.html', {'new_user': new_user})
     elif request.method == 'GET':
         user_form = UserRegistrationForm()
