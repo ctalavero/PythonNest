@@ -1,8 +1,6 @@
 from django.contrib import admin
 from .models import Course, Module, Lesson, Content, Text, File, Image, Video
 
-
-
 class ModuleInline(admin.StackedInline):
     model = Module
     extra = 1
@@ -13,10 +11,6 @@ class LessonInline(admin.StackedInline):
     extra = 1
     show_change_link = True
 
-class ContentInline(admin.StackedInline):
-    model = Content
-    extra = 1
-    show_change_link = True
 
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
@@ -50,7 +44,6 @@ class LessonAdmin(admin.ModelAdmin):
     list_display = ('title', 'module', 'order', 'passage_time')
     list_filter = ('module',)
     search_fields = ('title',)
-    inlines = [ContentInline]
 
 
 @admin.register(Content)
@@ -61,7 +54,7 @@ class ContentAdmin(admin.ModelAdmin):
 
 @admin.register(Text)
 class TextAdmin(admin.ModelAdmin):
-    list_display = ('title', 'created_at', 'updated_at')
+    list_display = ('title', 'created_at', 'updated_at',)
     search_fields = ('title', 'content')
     readonly_fields = ('created_at', 'updated_at')
 

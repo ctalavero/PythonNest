@@ -52,7 +52,7 @@ class ItemABS(models.Model):
         abstract = True
 
     def __str__(self):
-        return self.title
+        return f'({self.pk}) '+self.title
 
 class Text(ItemABS):
     content = models.TextField()
