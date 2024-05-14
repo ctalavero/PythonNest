@@ -6,14 +6,17 @@ from .models import Course, Module, Lesson, Content, Text, File, Image, Video
 class ModuleInline(admin.StackedInline):
     model = Module
     extra = 1
+    show_change_link = True
 
 class LessonInline(admin.StackedInline):
     model = Lesson
     extra = 1
+    show_change_link = True
 
 class ContentInline(admin.StackedInline):
     model = Content
     extra = 1
+    show_change_link = True
 
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
