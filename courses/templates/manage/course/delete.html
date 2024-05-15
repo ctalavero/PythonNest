@@ -1,10 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-
-</body>
-</html>
+<form action="" method="post">
+    {% csrf_token %}
+    <p>Ви впевнені, що хочете видалити "{{ object }}"?</p>
+    <button type="submit">Видалити</button>
+</form>

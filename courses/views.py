@@ -5,7 +5,7 @@ from .models import Course
 from .mixin import CreatorCourseMixin, CreatorCourseUpdateMixin
 
 class ManageCourseListView(CreatorCourseMixin, ListView):
-    template_name = 'courses/manage/course/list.html'
+    template_name = 'manage/course/list.html'
     permission_required = 'courses.view_course'
 
 class CourseCreateView(CreatorCourseUpdateMixin, CreateView):
@@ -16,7 +16,7 @@ class CourseUpdateView(CreatorCourseUpdateMixin, UpdateView):
 
 class CourseDeleteView(CreatorCourseMixin, DeleteView):
     permission_required = 'courses.delete_course'
-    template_name = 'courses/manage/course/delete.html'
+    template_name = 'manage/course/delete.html'
 
 
 
