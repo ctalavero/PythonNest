@@ -1,0 +1,34 @@
+{% load course %}
+<h1>Заняття "{{ lesson.title }}"</h1>
+{% if lesson.contents.all.exists %}
+    {% for content in lesson.contents.all %}
+        {% with item=content.item %}
+            <p>{{ item.title }} ({{ item|model_name }})</p>
+            <a href="{% url "content_update" lesson.id item|model_name item.id %}">Змінити</a>
+            <form action="{% url "content_delete" content.id %}" method="post">
+                <input type="submit" value="Delete">
+                <input type="hidden" name="lesson_id" value="{{lesson.id}}">
+                {% csrf_token %}
+            </form>
+        {% endwith %}
+    {% endfor %}
+    <h2>Додати новий контент:</h2>
+    <ul>
+        <li><a href="{% url "content_create" lesson.id "text" %}">Текст</a></li>
+        <li><a href="{% url "content_create" lesson.id "video" %}">Відео</a></li>
+        <li><a href="{% url "content_create" lesson.id "image" %}">Зображення</a></li>
+        <li><a href="{% url "content_create" lesson.id "file" %}">Файл</a></li>
+    </ul>
+    {% if form.instance.pk %}
+        <a href="{% url 'course_content_edit' form.instance.id %}">Редагувати Контент</a>
+    {% endif %}
+{% else %}
+    <h1>Цей урок ще не має змісту</h1>
+    <h2>Додати новий контент:</h2>
+    <ul>
+        <li><a href="{% url "content_create" lesson.id "text" %}">Текст</a></li>
+        <li><a href="{% url "content_create" lesson.id "video" %}">Відео</a></li>
+        <li><a href="{% url "content_create" lesson.id "image" %}">Зображення</a></li>
+        <li><a href="{% url "content_create" lesson.id "file" %}">Файл</a></li>
+    </ul>
+{% endif %}

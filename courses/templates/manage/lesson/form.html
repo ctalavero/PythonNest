@@ -1,7 +1,12 @@
 <h1>Редагування модуля "{{ module.title }}"</h1>
 <form method="post">
     {% csrf_token %}
-    {{ formset.as_p }}
+    {% for form in formset %}
+        {{ form.as_p }}
+        {% if form.instance.pk %}
+            <a href="{% url 'lesson_content_list' form.instance.id %}">Редагувати Контент</a>
+        {% endif %}
+    {% endfor %}
     {{ formset.management_form }}
     <button type="submit">Зберегти заняття</button>
 </form>

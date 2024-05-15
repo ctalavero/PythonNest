@@ -39,7 +39,7 @@ class Module(models.Model):
         ordering = ['order']
 
     def __str__(self):
-        return f'{self.order}). {self.title}'
+        return f'({self.order}:{self.pk}) {self.title}'
 
 
 
@@ -80,10 +80,10 @@ class Lesson(models.Model):
         ordering = ['order']
 
     def __str__(self):
-        return f'{self.order}). {self.title}'
+        return f'({self.order}:{self.pk}) {self.title}'
 
 class Content(models.Model):
-    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
+    lesson = models.ForeignKey(Lesson, related_name='contents',on_delete=models.CASCADE)
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, limit_choices_to={'model__in': ('text', 'video', 'image', 'file')})
     object_id = models.PositiveIntegerField()
     item = GenericForeignKey('content_type', 'object_id')
@@ -93,3 +93,5 @@ class Content(models.Model):
     class Meta:
         ordering = ['order']
 
+    def __str__(self):
+        return f'({self.order}:{self.pk}) {self.content_type.model}'

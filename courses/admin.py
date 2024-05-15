@@ -48,9 +48,13 @@ class LessonAdmin(admin.ModelAdmin):
 
 @admin.register(Content)
 class ContentAdmin(admin.ModelAdmin):
-    list_display = ('lesson', 'content_type', 'object_id', 'order')
+    list_display = ('item_title','lesson', 'content_type', 'object_id', 'order')
     list_filter = ('lesson', 'content_type')
     search_fields = ('lesson__title',)
+
+    def item_title(self, obj):
+        return obj.item.title
+    item_title.short_description = 'Item Title'
 
 @admin.register(Text)
 class TextAdmin(admin.ModelAdmin):

@@ -1,5 +1,8 @@
+from django.apps import apps
+from django.forms import modelform_factory, modelformset_factory
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.views.generic.base import TemplateResponseMixin, View
 
@@ -64,5 +67,58 @@ class CourseLessonUpdateView(TemplateResponseMixin, View):
         formset = self.get_formset(data=request.POST)
         if formset.is_valid():
             formset.save()
-            return redirect('course_list')
+            return redirect('lesson_content_list', lesson_id=self.lesson.id)
         return self.render_to_response({'module': self.module, 'formset': formset})
+
+
+class CourseContentListEditView(TemplateResponseMixin, View):
+    template_name = 'manage/content/list.html'
+
+    def get(self, request, lesson_id):
+        lesson = get_object_or_404(Lesson, id=lesson_id, module__course__created_by=request.user)
+        return self.render_to_response({'lesson': lesson})
+
+
+
+class CourseContentCreateUpdateView(TemplateResponseMixin, View):
+    lesson = None
+    model = None
+    obj = None
+    template_name = 'manage/content/form.html'
+
+    def get_model(self, model_name):
+        if model_name in ['text', 'video', 'image', 'file']:
+            return apps.get_model(app_label='courses', model_name=model_name)
+        return None
+
+    def get_form(self, model, *args, **kwargs):
+        Form = modelform_factory(model, exclude=['created_at', 'updated_at'])
+        return Form(*args, **kwargs)
+
+    def dispatch(self, request, lesson_id, model_name, id=None):
+        self.lesson = get_object_or_404(Lesson, id=lesson_id, module__course__created_by=request.user)
+        self.model = self.get_model(model_name)
+        if id:
+            self.obj = get_object_or_404(self.model, id=id)
+        return super().dispatch(request, lesson_id, model_name, id)
+
+    def get(self, request, lesson_id, model_name, id=None):
+        form = self.get_form(self.model, instance=self.obj)
+        return self.render_to_response({'form': form, 'object': self.obj})
+
+    def post(self, request, lesson_id, model_name, id=None):
+        form = self.get_form(self.model, instance=self.obj, data=request.POST, files=request.FILES)
+        if form.is_valid():
+            obj = form.save(commit=False)
+            obj.save()
+            if not id:
+                Content.objects.create(lesson=self.lesson,item=obj)
+            return redirect('lesson_content_list', lesson_id=self.lesson.id)
+        return self.render_to_response({'form': form, 'object': self.obj})
+
+class CourseContentDeleteView(View):
+    def post(self, request, id):
+        content = get_object_or_404(Content, id=id, lesson__module__course__created_by=request.user)
+        content.item.delete()
+        content.delete()
+        return redirect('lesson_content_list', lesson_id=int(request.POST.get('lesson_id')))
