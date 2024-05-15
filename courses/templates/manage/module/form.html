@@ -1,7 +1,12 @@
-<h1>Редагування "{{ course.title }}"</h1>
+<h1>Редагування курса "{{ course.title }}"</h1>
 <form method="post">
     {% csrf_token %}
-    {{ formset.as_p }}
+    {% for form in formset %}
+        {{ form.as_p }}
+        {% if form.instance.pk %}
+            <a href="{% url 'course_lesson_update' form.instance.id %}">Редагувати уроки</a>
+        {% endif %}
+    {% endfor %}
     {{ formset.management_form }}
     <button type="submit">Зберегти модуль</button>
 </form>

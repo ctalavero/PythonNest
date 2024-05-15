@@ -3,8 +3,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.views.generic.base import TemplateResponseMixin, View
 
-from .forms import ModuleFormSet
-from .models import Course
+from .forms import ModuleFormSet, LessonFormSet
+from .models import Course, Module, Content, Lesson
 from .mixin import CreatorCourseMixin, CreatorCourseUpdateMixin
 
 class ManageCourseListView(CreatorCourseMixin, ListView):
@@ -44,3 +44,25 @@ class CourseModuleUpdateView(TemplateResponseMixin, View):
         return self.render_to_response({'course': self.course, 'formset': formset})
 
 
+
+class CourseLessonUpdateView(TemplateResponseMixin, View):
+    template_name = 'manage/lesson/form.html'
+    module = None
+
+    def get_formset(self, data=None):
+        return LessonFormSet(instance=self.module, data=data)
+
+    def dispatch(self, request, pk):
+        self.module = get_object_or_404(Module, id=pk, course__created_by=request.user)
+        return super().dispatch(request, pk)
+
+    def get(self, request, pk):
+        formset = self.get_formset()
+        return self.render_to_response({'module': self.module, 'formset': formset})
+
+    def post(self, request, pk):
+        formset = self.get_formset(data=request.POST)
+        if formset.is_valid():
+            formset.save()
+            return redirect('course_list')
+        return self.render_to_response({'module': self.module, 'formset': formset})

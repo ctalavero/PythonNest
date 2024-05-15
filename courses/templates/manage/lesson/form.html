@@ -1,0 +1,7 @@
+<h1>Редагування модуля "{{ module.title }}"</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ formset.as_p }}
+    {{ formset.management_form }}
+    <button type="submit">Зберегти заняття</button>
+</form>
