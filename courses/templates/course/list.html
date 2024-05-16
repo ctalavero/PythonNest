@@ -20,7 +20,7 @@
             {% endif %}
             <p>Tags:
                 {% for tag in course.tags.all %}
-                    <a href="?tags={{ tag.name|lower }}">{{ tag.name }}</a>
+                    <a href="?tags={{ tag.pk }}">{{ tag.name }}</a>
                     {% if not forloop.last %}, {% endif %}
                 {% endfor %}
             </p>
