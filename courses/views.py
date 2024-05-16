@@ -143,33 +143,22 @@ class CourseListView(TemplateResponseMixin, View):
             passage_time = form.cleaned_data.get('passage_time')
             course_name = form.cleaned_data.get('course_name')
 
-            context = {}
-
             if tags:
                 tags = [tag.name.lower() for tag in tags]
-                courses = courses.filter(tags__name__in=tags).distinct()
-                context['selected_tags'] = tags
+                courses = courses.filter(tags__name__iregex=r'(' + '|'.join(tags) + ')').distinct()
 
             if rating:
                 courses = courses.filter(rating__gte=rating)
-                context['rating'] = rating
 
             if passage_time:
                 hours, minutes, seconds = map(int, passage_time.split(':'))
                 passage_time = timedelta(hours=hours, minutes=minutes, seconds=seconds)
                 courses = courses.filter(passage_time__lte=passage_time)
-                context['passage_time'] = passage_time
 
             if course_name:
                 courses = courses.annotate(
-                    similarity=TrigramSimilarity('title::VARCHAR', course_name)
-                ).filter(similarity__gt=0.3).order_by('-similarity')
-                context['course_name'] = course_name
-
-            context['courses'] = courses
-            context['form'] = form
-
-            return self.render_to_response(context)
+                    similarity=TrigramSimilarity('title', course_name)
+                ).filter(similarity__gt=0.1).order_by('-similarity')
 
         context = {
             'courses': courses,

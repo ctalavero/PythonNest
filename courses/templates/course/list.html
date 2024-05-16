@@ -1,19 +1,26 @@
-<h1>Course List</h1>
+{% load static %}
+
+<h1>Список курсів</h1>
 <a href="{% url 'dashboard' %}">Back to Dashboard</a>
 <br>
 
 <form method="get">
     {{ form.as_p }}
-    <input type="submit" value="Filter">
+    <input type="submit" value="Фільтрувати">
 </form>
 
 <ul>
     {% for course in courses %}
         <li>
             <h2>{{ course.title }}</h2>
+            {% if course.logo %}
+                <img src="{{ course.logo.url }}" alt="{{ course.title }} logo" style="width: 120px; height: auto;">
+            {% else %}
+                <img src="{% static 'logos/course-logo-default.jpg' %}" alt="Default course logo" style="width: 120px; height: auto;">
+            {% endif %}
             <p>Tags:
                 {% for tag in course.tags.all %}
-                    {{ tag.name }}
+                    <a href="?tags={{ tag.name|lower }}">{{ tag.name }}</a>
                     {% if not forloop.last %}, {% endif %}
                 {% endfor %}
             </p>
