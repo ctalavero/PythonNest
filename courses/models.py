@@ -8,6 +8,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 
 class Course(models.Model):
     created_by = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='courses_created')
+    published = models.BooleanField(default=False)
     title = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255, unique=True)
     description = models.TextField()

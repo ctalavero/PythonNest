@@ -14,7 +14,7 @@ class LessonInline(admin.StackedInline):
 
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
-    list_display = ('title', 'created_by', 'created_at', 'rating')
+    list_display = ('title','published', 'created_by', 'created_at', 'rating')
     list_filter = ('created_at', 'tags')
     search_fields = ('title', 'description')
     prepopulated_fields = {'slug': ('title',)}
@@ -35,6 +35,8 @@ class ModuleAdmin(admin.ModelAdmin):
     list_display = ('title', 'course', 'order')
     list_filter = ('course',)
     search_fields = ('title', 'description')
+    list_editable = ('order',)
+    ordering = ('lesson', 'order')
     inlines = [LessonInline]
 
 
@@ -44,6 +46,8 @@ class LessonAdmin(admin.ModelAdmin):
     list_display = ('title', 'module', 'order', 'passage_time')
     list_filter = ('module',)
     search_fields = ('title',)
+    list_editable = ('order',)
+    ordering = ('module', 'order')
 
 
 @admin.register(Content)
@@ -51,6 +55,8 @@ class ContentAdmin(admin.ModelAdmin):
     list_display = ('item_title','lesson', 'content_type', 'object_id', 'order')
     list_filter = ('lesson', 'content_type')
     search_fields = ('lesson__title',)
+    list_editable = ('order',)
+    ordering = ('lesson', 'order')
 
     def item_title(self, obj):
         return obj.item.title
