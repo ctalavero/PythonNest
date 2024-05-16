@@ -22,6 +22,7 @@ class CourseAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('title',)}
     filter_horizontal = ('user',)
     readonly_fields = ('created_at','display_logo')
+    list_editable = ('published',)
     fieldsets = (
         (None, {
             'fields': ('created_by', 'title', 'slug','logo','display_logo', 'description', 'tags', 'user', 'passage_time', 'rating','published')

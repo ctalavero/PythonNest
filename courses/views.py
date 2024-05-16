@@ -1,3 +1,8 @@
+from datetime import timedelta
+
+from django.contrib.postgres.search import SearchVector, TrigramSimilarity
+from django.db.models import Q
+from taggit.models import Tag
 from django.apps import apps
 from django.forms import modelform_factory, modelformset_factory
 from django.shortcuts import render, get_object_or_404, redirect
@@ -122,3 +127,42 @@ class CourseContentDeleteView(View):
         content.item.delete()
         content.delete()
         return redirect('lesson_content_list', lesson_id=int(request.POST.get('lesson_id')))
+
+
+class CourseListView(TemplateResponseMixin, View):
+    model = Course
+    template_name = 'course/list.html'
+
+    def get(self, request):
+        courses = self.model.objects.all().filter(published=True)
+        tags = request.GET.getlist('tags')
+        rating = request.GET.get('rating')
+        passage_time = request.GET.get('passage_time')
+        course_name = request.GET.get('course_name')
+
+        context = {}
+
+        if tags:
+            courses = courses.filter(tags__name__in=tags).distinct()
+            context['selected_tags'] = tags
+
+        if rating:
+            courses = courses.filter(rating__gte=rating)
+            context['rating'] = rating
+
+        if passage_time:
+            hours, minutes, seconds = map(int, passage_time.split(':'))
+            passage_time = timedelta(hours=hours, minutes=minutes, seconds=seconds)
+            courses = courses.filter(passage_time__lte=passage_time)
+            context['passage_time'] = passage_time
+
+        if course_name:
+            courses = courses.annotate(
+                similarity=TrigramSimilarity('title', course_name)
+            ).filter(similarity__gt=0.1).order_by('-similarity')
+            context['course_name'] = course_name
+
+        context['courses'] = courses
+        context['tags'] = Tag.objects.all()
+
+        return self.render_to_response(context)
