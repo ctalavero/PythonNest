@@ -24,7 +24,7 @@ class CourseAdmin(admin.ModelAdmin):
     readonly_fields = ('created_at','display_logo')
     fieldsets = (
         (None, {
-            'fields': ('created_by', 'title', 'slug','logo','display_logo', 'description', 'tags', 'user', 'passage_time', 'rating')
+            'fields': ('created_by', 'title', 'slug','logo','display_logo', 'description', 'tags', 'user', 'passage_time', 'rating','published')
         }),
         ('Timestamps', {
             'fields': ('created_at',),
