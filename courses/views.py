@@ -11,7 +11,7 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.views.generic.base import TemplateResponseMixin, View
 
-from .forms import ModuleFormSet, LessonFormSet
+from .forms import ModuleFormSet, LessonFormSet, CourseFilterForm
 from .models import Course, Module, Content, Lesson
 from .mixin import CreatorCourseMixin, CreatorCourseUpdateMixin
 
@@ -134,35 +134,46 @@ class CourseListView(TemplateResponseMixin, View):
     template_name = 'course/list.html'
 
     def get(self, request):
+        form = CourseFilterForm(request.GET)
         courses = self.model.objects.all().filter(published=True)
-        tags = request.GET.getlist('tags')
-        rating = request.GET.get('rating')
-        passage_time = request.GET.get('passage_time')
-        course_name = request.GET.get('course_name')
 
-        context = {}
+        if form.is_valid():
+            tags = form.cleaned_data.get('tags')
+            rating = form.cleaned_data.get('rating')
+            passage_time = form.cleaned_data.get('passage_time')
+            course_name = form.cleaned_data.get('course_name')
 
-        if tags:
-            courses = courses.filter(tags__name__in=tags).distinct()
-            context['selected_tags'] = tags
+            context = {}
 
-        if rating:
-            courses = courses.filter(rating__gte=rating)
-            context['rating'] = rating
+            if tags:
+                tags = [tag.name.lower() for tag in tags]
+                courses = courses.filter(tags__name__in=tags).distinct()
+                context['selected_tags'] = tags
 
-        if passage_time:
-            hours, minutes, seconds = map(int, passage_time.split(':'))
-            passage_time = timedelta(hours=hours, minutes=minutes, seconds=seconds)
-            courses = courses.filter(passage_time__lte=passage_time)
-            context['passage_time'] = passage_time
+            if rating:
+                courses = courses.filter(rating__gte=rating)
+                context['rating'] = rating
 
-        if course_name:
-            courses = courses.annotate(
-                similarity=TrigramSimilarity('title', course_name)
-            ).filter(similarity__gt=0.1).order_by('-similarity')
-            context['course_name'] = course_name
+            if passage_time:
+                hours, minutes, seconds = map(int, passage_time.split(':'))
+                passage_time = timedelta(hours=hours, minutes=minutes, seconds=seconds)
+                courses = courses.filter(passage_time__lte=passage_time)
+                context['passage_time'] = passage_time
 
-        context['courses'] = courses
-        context['tags'] = Tag.objects.all()
+            if course_name:
+                courses = courses.annotate(
+                    similarity=TrigramSimilarity('title::VARCHAR', course_name)
+                ).filter(similarity__gt=0.3).order_by('-similarity')
+                context['course_name'] = course_name
+
+            context['courses'] = courses
+            context['form'] = form
+
+            return self.render_to_response(context)
+
+        context = {
+            'courses': courses,
+            'form': form
+        }
 
         return self.render_to_response(context)
