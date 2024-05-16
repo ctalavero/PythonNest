@@ -8,7 +8,7 @@ ModuleFormSet = inlineformset_factory(Course, Module, fields=['title', 'descript
 LessonFormSet = inlineformset_factory(Module, Lesson, fields=['title', 'order',], extra=2, can_delete=True)
 
 class CourseFilterForm(forms.Form):
-    course_name = forms.CharField(required=False, label='Назва курсу')
+    course_name = forms.CharField(required=False, label='Пошук курсу')
     tags = forms.ModelMultipleChoiceField(
         queryset=Tag.objects.all(),
         required=False,

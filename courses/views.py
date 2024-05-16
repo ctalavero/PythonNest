@@ -1,7 +1,7 @@
 from datetime import timedelta
 
 from django.contrib.postgres.search import SearchVector, TrigramSimilarity
-from django.db.models import Q
+from django.db.models import Q, F
 from taggit.models import Tag
 from django.apps import apps
 from django.forms import modelform_factory, modelformset_factory
@@ -157,8 +157,11 @@ class CourseListView(TemplateResponseMixin, View):
 
             if course_name:
                 courses = courses.annotate(
-                    similarity=TrigramSimilarity('title', course_name)
-                ).filter(similarity__gt=0.1).order_by('-similarity')
+                    title_similarity=TrigramSimilarity('title', course_name),
+                    description_similarity=TrigramSimilarity('description', course_name),
+                ).annotate(
+                    total_similarity=F('title_similarity') + F('description_similarity')
+                ).filter(total_similarity__gt=0.1).order_by('-total_similarity')
 
         context = {
             'courses': courses,
