@@ -11,6 +11,7 @@ class Course(models.Model):
     published = models.BooleanField(default=False)
     title = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255, unique=True)
+    logo = models.ImageField(upload_to='logos', blank=True, null=True, default='logos/course-logo-default.jpg')
     description = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     tags = TaggableManager()

@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.utils.html import format_html
+
 from .models import Course, Module, Lesson, Content, Text, File, Image, Video
 
 class ModuleInline(admin.StackedInline):
@@ -14,21 +16,25 @@ class LessonInline(admin.StackedInline):
 
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
-    list_display = ('title','published', 'created_by', 'created_at', 'rating')
+    list_display = ('title','display_logo','published', 'created_by', 'created_at', 'rating')
     list_filter = ('created_at', 'tags')
     search_fields = ('title', 'description')
     prepopulated_fields = {'slug': ('title',)}
     filter_horizontal = ('user',)
-    readonly_fields = ('created_at',)
+    readonly_fields = ('created_at','display_logo')
     fieldsets = (
         (None, {
-            'fields': ('created_by', 'title', 'slug', 'description', 'tags', 'user', 'passage_time', 'rating')
+            'fields': ('created_by', 'title', 'slug','logo','display_logo', 'description', 'tags', 'user', 'passage_time', 'rating')
         }),
         ('Timestamps', {
             'fields': ('created_at',),
         }),
     )
     inlines = [ModuleInline]
+
+    def display_logo(self, obj):
+        return format_html('<img src="{}" height="50" />', obj.logo.url)
+    display_logo.short_description = 'Logo'
 
 @admin.register(Module)
 class ModuleAdmin(admin.ModelAdmin):

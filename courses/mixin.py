@@ -15,7 +15,7 @@ class CreatorCourseMixin(IsCreatorMixin,
                          LoginRequiredMixin,
                          PermissionRequiredMixin):
     model = Course
-    fields = ['title','published', 'slug', 'description', 'tags']
+    fields = ['title','published','logo', 'slug', 'description', 'tags']
     success_url = reverse_lazy('manage_course_list')
 
 class CreatorCourseUpdateMixin(CreatorCourseMixin, CreatorEditMixin):
