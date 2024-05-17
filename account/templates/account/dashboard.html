@@ -3,5 +3,7 @@
 <a href="{% url 'logout' %}">натисніть тут щоб вийти</a>
 <p>юзер {{ user.username }}</p>
 <br>
-<a href="{% url 'manage_course_list' %}">Редагувати курси</a>
+{% if perms.courses.view_course %}
+    <a href="{% url 'manage_course_list' %}">Редагувати курси</a>
+{% endif %}
 <a href="{% url 'course_list' %}">Список курсів</a>

@@ -18,6 +18,8 @@ from .mixin import CreatorCourseMixin, CreatorCourseUpdateMixin
 class ManageCourseListView(CreatorCourseMixin, ListView):
     template_name = 'manage/course/list.html'
     permission_required = 'courses.view_course'
+    login_url = reverse_lazy('dashboard')
+    raise_exception = True
 
 class CourseCreateView(CreatorCourseUpdateMixin, CreateView):
     permission_required = 'courses.add_course'
