@@ -1,0 +1,47 @@
+.course-detail {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.course-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.course-logo {
+    width: 150px;
+    height: auto;
+    margin-right: 20px;
+}
+
+.course-info {
+    max-width: 600px;
+}
+
+.course-modules {
+    width: 80%;
+}
+
+.module {
+    background: #f5f5f5;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.lessons {
+    list-style-type: none;
+    padding: 0;
+}
+
+.lessons li {
+    padding: 5px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.lessons li:last-child {
+    border-bottom: none;
+}

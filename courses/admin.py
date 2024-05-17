@@ -43,7 +43,7 @@ class ModuleAdmin(admin.ModelAdmin):
     list_filter = ('course',)
     search_fields = ('title', 'description')
     list_editable = ('order',)
-    ordering = ('lesson', 'order')
+    ordering = ('lessons', 'order')
     inlines = [LessonInline]
 
 

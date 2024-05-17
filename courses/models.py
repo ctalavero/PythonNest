@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.urls import reverse
 from taggit.managers import TaggableManager
 from .fields import OrderField
 from django.contrib.contenttypes.models import ContentType
@@ -29,10 +30,11 @@ class Course(models.Model):
     def __str__(self):
         return self.title
 
-
+    def get_absolute_url(self):
+        return reverse('course_detail', args=[self.slug])
 
 class Module(models.Model):
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='modules')
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     order = OrderField(blank=True, for_fields=['course'])
@@ -74,7 +76,7 @@ class Video(ItemABS):
             raise ValidationError('Either URL or file must be provided.')
 
 class Lesson(models.Model):
-    module = models.ForeignKey(Module, on_delete=models.CASCADE)
+    module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name='lessons')
     title = models.CharField(max_length=255)
     order = OrderField(blank=True, for_fields=['module'])
     passage_time = models.DurationField(blank=True, null=True)

@@ -169,3 +169,16 @@ class CourseListView(TemplateResponseMixin, View):
         }
 
         return self.render_to_response(context)
+
+class CourseDetailView(DetailView):
+    model = Course
+    template_name = 'course/detail.html'
+
+    def get_queryset(self):
+        return super().get_queryset().filter(published=True)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['modules'] = self.object.modules.all()
+        context['lessons'] = Lesson.objects.filter(module__in=context['modules'])
+        return context

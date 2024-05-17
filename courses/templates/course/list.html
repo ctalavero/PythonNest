@@ -27,6 +27,7 @@
             </p>
             <p>Rating: {{ course.rating }}</p>
             <p>Passage Time: {{ course.passage_time }}</p>
+            <p><a href="{{ course.get_absolute_url }}">Перейти до курсу</a></p>
         </li>
     {% empty %}
         <li>No courses found.</li>
