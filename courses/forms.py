@@ -24,3 +24,6 @@ class CourseFilterForm(forms.Form):
                 raise ValidationError('Введіть час у форматі HH:MM:SS')
 
         return passage_time
+
+class CourseEnrollForm(forms.Form):
+    course = forms.ModelChoiceField(queryset=Course.objects.all(), widget=forms.HiddenInput)

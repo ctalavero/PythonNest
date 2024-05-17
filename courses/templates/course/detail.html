@@ -17,6 +17,13 @@
                 <p>Duration: {{ course.passage_time|format_duration }}</p>
                 <p>Rating: {{ course.rating }}/5.0</p>
                 <p>{{ course.description }}</p>
+                {% if user.is_authenticated and not enrolled %}
+                    <form method="post" action="{% url 'course_enroll' %}">
+                        <input type="hidden" name="course" value="{{ course.id }}">
+                        {% csrf_token %}
+                        <input type="submit" value="Підписатися на курс">
+                    </form>
+                {% endif %}
             </div>
         </div>
 

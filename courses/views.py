@@ -10,8 +10,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.views.generic.base import TemplateResponseMixin, View
+from django.views.generic.edit import FormView
 
-from .forms import ModuleFormSet, LessonFormSet, CourseFilterForm
+from .forms import ModuleFormSet, LessonFormSet, CourseFilterForm, CourseEnrollForm
 from .models import Course, Module, Content, Lesson
 from .mixin import CreatorCourseMixin, CreatorCourseUpdateMixin
 
@@ -183,4 +184,14 @@ class CourseDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context['modules'] = self.object.modules.all()
         context['lessons'] = Lesson.objects.filter(module__in=context['modules'])
+        context['enrolled'] = self.object.user.filter(id=self.request.user.id).exists()
         return context
+
+def course_enroll(request):
+    if request.method == 'POST':
+        form = CourseEnrollForm(request.POST)
+        if form.is_valid():
+            course = form.cleaned_data['course']
+            course.user.add(request.user)
+            return redirect('course_detail', slug=course.slug)
+    return redirect('course_list')
