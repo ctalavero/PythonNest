@@ -1,0 +1,50 @@
+{% load static %}
+{% load course %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ course.title }}</title>
+    <link rel="stylesheet" href="{% static 'css/detail.css' %}">
+</head>
+<body>
+    <div class="course-detail">
+        <p><a href="{% url 'enroll_course_list' %}">Back to Enrolled Courses</a></p>
+        <div class="course-header">
+            <img src="{{ course.logo.url }}" alt="{{ course.title }} logo" class="course-logo">
+            <div class="course-info">
+                <h1>{{ course.title }}</h1>
+                <p>By: {{ course.created_by }}</p>
+                <p>Duration: {{ course.passage_time|format_duration }}</p>
+                <p>Rating: {{ course.rating }}/5.0</p>
+                <p>{{ course.description }}</p>
+            </div>
+        </div>
+
+        <div class="course-modules">
+            {% if course.modules.count == 0 %}
+                <p>No modules found.</p>
+            {% else %}
+            <h2>Модулі</h2>
+            {% endif %}
+            {% for module in modules %}
+                <div class="module">
+                    <h3>{{ module.title }}</h3>
+                    <p>{{ module.description }}</p>
+                    <a href="{% url 'enroll_module_detail' pk=course.id module_id=module.id %}">Детальніше про модуль</a>
+                    <ul class="lessons">
+                        {% for lesson in lessons %}
+                            {% if lesson.module_id == module.id %}
+                                <li>
+                                    <p>{{ lesson.title }}</p>
+                                    <p>Тривалість: {{ lesson.passage_time|format_duration }}</p>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

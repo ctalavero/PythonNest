@@ -1,0 +1,29 @@
+{% load static %}
+{% load course %}
+<!DOCTYPE html>
+<p><a href="{% url 'dashboard' %}">Перейти на панель управління </a></p>
+<h1>Мої курси</h1>
+<ul>
+    {% for course in object_list %}
+    <li>
+        <h2>{{ course.title }}</h2>
+        {% if course.logo %}
+        <img src="{{ course.logo.url }}" alt="{{ course.title }} logo" style="width: 120px; height: auto;">
+        {% else %}
+        <img src="{% static 'logos/course-logo-default.jpg' %}" alt="Default course logo"
+             style="width: 120px; height: auto;">
+        {% endif %}
+        <p>Tags:
+            {% for tag in course.tags.all %}
+            <a href="?tags={{ tag.pk }}">{{ tag.name }}</a>
+            {% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p>Rating: {{ course.rating }}</p>
+        <p>Passage Time: {{ course.passage_time }}</p>
+        <p><a href="{% url 'enroll_course_detail' course.id %}">Перейти до курсу</a></p>
+    </li>
+    {% empty %}
+    <li>No courses found.</li>
+    {% endfor %}
+</ul>

@@ -1,0 +1,31 @@
+{% load static %}
+{% load course %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ module.title }}</title>
+    <link rel="stylesheet" href="{% static 'css/detail.css' %}">
+</head>
+<body>
+    <div class="module-detail">
+        <div class="module-header">
+            <h1>{{ module.title }}</h1>
+            <p>{{ module.description }}</p>
+        </div>
+
+        <div class="module-lessons">
+            <h2>Уроки</h2>
+            <ul class="lessons">
+                {% for lesson in lessons %}
+                    <li>
+                        <p>{{ lesson.title }}</p>
+                        <p>Тривалість: {{ lesson.passage_time|format_duration }}</p>
+                        <a href="{% url 'enroll_lesson_detail' lesson.module.course.id lesson.module.id lesson.id %}">Детальніше про урок</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

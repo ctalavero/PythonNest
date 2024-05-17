@@ -187,6 +187,11 @@ class CourseDetailView(DetailView):
         context['enrolled'] = self.object.user.filter(id=self.request.user.id).exists()
         return context
 
+
+############################################################################################################
+# Enroll courses view
+############################################################################################################
+
 def course_enroll(request):
     if request.method == 'POST':
         form = CourseEnrollForm(request.POST)
@@ -195,3 +200,57 @@ def course_enroll(request):
             course.user.add(request.user)
             return redirect('course_detail', slug=course.slug)
     return redirect('course_list')
+
+class EnrollCourseListView(LoginRequiredMixin, ListView):
+    model = Course
+    template_name = 'course/enroll_list.html'
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.filter(user=self.request.user)
+
+
+
+class EnrollCourseDetailView(DetailView):
+    model = Course
+    template_name = 'course/enroll_detail.html'
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.filter(user=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            course = self.get_object()
+            modules = course.modules.all()
+            lessons = Lesson.objects.filter(module__in=modules)
+            context['modules'] = modules
+            context['lessons'] = lessons
+        except Exception as e:
+            pass
+        return context
+
+
+class EnrollModuleDetailView(DetailView):
+    model = Module
+    template_name = 'course/enroll_module_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        module = self.get_object()
+        lessons = module.lessons.all()
+        context['module'] = module
+        context['lessons'] = lessons
+        return context
+
+
+class EnrollLessonDetailView(DetailView):
+    model = Lesson
+    template_name = 'course/enroll_lesson_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        lesson = self.get_object()
+        context['lesson'] = lesson
+        return context
