@@ -20,7 +20,7 @@
             {% endfor %}
         </p>
         <p>Rating: {{ course.rating }}</p>
-        <p>Passage Time: {{ course.passage_time }}</p>
+        <p>Passage Time: {{ course.passage_time| format_duration }}</p>
         <p><a href="{% url 'enroll_course_detail' course.id %}">Перейти до курсу</a></p>
     </li>
     {% empty %}

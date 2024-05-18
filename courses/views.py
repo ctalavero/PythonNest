@@ -76,7 +76,8 @@ class CourseLessonUpdateView(TemplateResponseMixin, View):
         formset = self.get_formset(data=request.POST)
         if formset.is_valid():
             formset.save()
-            return redirect('lesson_content_list', lesson_id=self.lesson.id)
+            lesson = formset.instance
+            return redirect('lesson_content_list', lesson_id=lesson.id)
         return self.render_to_response({'module': self.module, 'formset': formset})
 
 
