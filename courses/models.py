@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
@@ -8,6 +10,11 @@ from taggit.managers import TaggableManager
 from .fields import OrderField
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
+from django.conf import settings
+
+from .functions import get_video_id_from_url, get_youtube_video_duration
+
+
 # Create your models here.
 
 class Course(models.Model):
@@ -39,6 +46,16 @@ class Course(models.Model):
     def update_rating(self):
         avg_rating = self.reviews.aggregate(Avg('rating'))['rating__avg']
         self.rating = avg_rating if avg_rating is not None else 0
+        self.save()
+
+    def calculate_passage_time(self):
+        total_time = timedelta()
+        for module in self.modules.all():
+            for lesson in module.lessons.all():
+                lesson.calculate_passage_time()
+                if lesson.passage_time:
+                    total_time += lesson.passage_time
+        self.passage_time = total_time
         self.save()
 
 class Module(models.Model):
@@ -84,12 +101,23 @@ class Image(ItemABS):
 class Video(ItemABS):
     url = models.URLField(blank=True, null=True)
     file = models.FileField(upload_to='videos', blank=True, null=True)
+    duration = models.DurationField(blank=True, null=True)
 
     def clean(self):
         if not self.url and not self.file:
             raise ValidationError('Either URL or file must be provided.')
         if self.file and not self.file.name.endswith('.mp4'):
             raise ValidationError('Uploaded video must be a .mp4 file.')
+
+    def save(self, *args, **kwargs):
+        if self.url:
+            self.file = None
+            video_id = get_video_id_from_url(self.url)
+            if video_id is not None:
+                duration_in_seconds = get_youtube_video_duration(video_id, settings.GOOGLE_YOUTUBE_API_KEY)
+                self.duration = timedelta(seconds=duration_in_seconds)
+
+        super().save(*args, **kwargs)
 
 
 class Lesson(models.Model):
@@ -102,6 +130,19 @@ class Lesson(models.Model):
 
     def __str__(self):
         return f'({self.order}:{self.pk}) {self.title}'
+
+    def calculate_passage_time(self):
+        total_time = timedelta()
+        for content in self.contents.all():
+            item = content.item
+            if isinstance(item, Video) and item.duration:
+                total_time += item.duration
+            elif isinstance(item, Text):
+                word_count = len(item.content.split())
+                reading_time = word_count / 200
+                total_time += timedelta(minutes=reading_time)
+        self.passage_time = total_time
+        self.save()
 
 class Content(models.Model):
     lesson = models.ForeignKey(Lesson, related_name='contents',on_delete=models.CASCADE)
