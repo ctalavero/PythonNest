@@ -1,0 +1,8 @@
+{% load embed_video_tags %}
+<p>
+    {% if item.url %}
+        {% video item.url "small" %}
+    {% else %}
+        Зараз ми не підтримуємо відео крім YouTube.
+    {% endif %}
+</p>

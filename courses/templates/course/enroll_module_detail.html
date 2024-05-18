@@ -21,7 +21,7 @@
                     <li>
                         <p>{{ lesson.title }}</p>
                         <p>Тривалість: {{ lesson.passage_time|format_duration }}</p>
-                        <a href="{% url 'enroll_lesson_detail' lesson.module.course.id lesson.module.id lesson.id %}">Детальніше про урок</a>
+                        <a href="{% url 'enroll_lesson_detail' pk=module.course.id module_id=module.id lesson_id=lesson.id %}">Перейти до уроку</a>
                     </li>
                 {% endfor %}
             </ul>

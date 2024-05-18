@@ -22,7 +22,7 @@ urlpatterns = [
     path('enroll-list/', views.EnrollCourseListView.as_view(), name='enroll_course_list'),
     path('enroll-detail/<pk>/', views.EnrollCourseDetailView.as_view(), name='enroll_course_detail'),
     path('enroll-detail/<int:pk>/module/<int:module_id>/', views.EnrollModuleDetailView.as_view(), name='enroll_module_detail'),
-    path('enroll-detail/<pk>/module/<module_id>/lesson/<lesson_id>/', views.EnrollLessonDetailView.as_view(), name='enroll_lesson_detail'),
+    path('enroll-detail/<int:pk>/module/<int:module_id>/lesson/<int:lesson_id>/', views.EnrollLessonDetailView.as_view(), name='enroll_lesson_detail'),
 
 
 

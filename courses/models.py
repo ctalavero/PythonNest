@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.template.loader import render_to_string
 from django.urls import reverse
 from taggit.managers import TaggableManager
 from .fields import OrderField
@@ -58,6 +59,12 @@ class ItemABS(models.Model):
     def __str__(self):
         return f'({self.pk}) '+self.title
 
+    def render(self):
+        return render_to_string(
+            f'content/{self._meta.model_name}.html',
+            {'item': self}
+        )
+
 class Text(ItemABS):
     content = models.TextField()
 
@@ -74,6 +81,9 @@ class Video(ItemABS):
     def clean(self):
         if not self.url and not self.file:
             raise ValidationError('Either URL or file must be provided.')
+        if self.file and not self.file.name.endswith('.mp4'):
+            raise ValidationError('Uploaded video must be a .mp4 file.')
+
 
 class Lesson(models.Model):
     module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name='lessons')

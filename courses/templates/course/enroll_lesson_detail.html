@@ -1,10 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-
-</body>
-</html>
+<h1>{{ lesson.title }}</h1>
+{% if lesson.contents.all %}
+    <div class="contents">
+        {% for content in lesson.contents.all %}
+        <h2>{{ content.item.title}}</h2>
+            {{ content.item.render }}
+        {% endfor %}
+    </div>
+{% else %}
+no content
+{% endif %}

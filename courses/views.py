@@ -254,9 +254,18 @@ class EnrollModuleDetailView(DetailView):
 class EnrollLessonDetailView(DetailView):
     model = Lesson
     template_name = 'course/enroll_lesson_detail.html'
+    context_object_name = 'lesson'
+
+    def get_object(self):
+        course_id = self.kwargs.get('pk')
+        module_id = self.kwargs.get('module_id')
+        lesson_id = self.kwargs.get('lesson_id')
+        course = get_object_or_404(Course, id=course_id, user=self.request.user)
+        module = get_object_or_404(Module, id=module_id, course=course)
+        return get_object_or_404(Lesson, id=lesson_id, module=module)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        lesson = self.get_object()
-        context['lesson'] = lesson
+        context['module'] = self.get_object().module
+        context['course'] = self.get_object().module.course
         return context
