@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 from django.core.exceptions import ValidationError
+from django.core.files.storage import default_storage
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.db.models import Avg
@@ -12,7 +13,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.conf import settings
 
-from .functions import get_video_id_from_url, get_youtube_video_duration
+from .functions import get_video_id_from_url, get_youtube_video_duration, get_video_duration
 
 
 # Create your models here.
@@ -116,6 +117,10 @@ class Video(ItemABS):
             if video_id is not None:
                 duration_in_seconds = get_youtube_video_duration(video_id, settings.GOOGLE_YOUTUBE_API_KEY)
                 self.duration = timedelta(seconds=duration_in_seconds)
+        if self.file:
+            video_path = default_storage.path(self.file.name)
+            duration_in_seconds = get_video_duration(video_path)
+            self.duration = timedelta(seconds=duration_in_seconds)
 
         super().save(*args, **kwargs)
 

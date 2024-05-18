@@ -1,7 +1,7 @@
 import requests
 import  isodate
 from urllib.parse import urlparse, parse_qs
-
+from moviepy.editor import VideoFileClip
 def get_video_id_from_url(url):
     parsed_url = urlparse(url)
     video_id = parse_qs(parsed_url.query).get('v')
@@ -16,3 +16,7 @@ def get_youtube_video_duration(video_id, api_key):
     duration = isodate.parse_duration(data['items'][0]['contentDetails']['duration'])
     return duration.total_seconds()
 
+def get_video_duration(video_path):
+    clip = VideoFileClip(video_path)
+    duration = clip.duration # in seconds
+    return duration
