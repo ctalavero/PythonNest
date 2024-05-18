@@ -18,6 +18,7 @@
                 <p>Duration: {{ course.passage_time|format_duration }}</p>
                 <p>Rating: {{ course.rating }}/5.0</p>
                 <p>{{ course.description }}</p>
+                <p><a href="{% url 'add_review' course_id=course.id %}">Надати відгук про курс</a></p>
             </div>
         </div>
 

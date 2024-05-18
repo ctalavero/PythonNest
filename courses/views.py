@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+from django.contrib.auth.decorators import login_required
 from django.contrib.postgres.search import SearchVector, TrigramSimilarity
 from django.db.models import Q, F
 from taggit.models import Tag
@@ -7,13 +8,13 @@ from django.apps import apps
 from django.forms import modelform_factory, modelformset_factory
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.views.generic.base import TemplateResponseMixin, View
 from django.views.generic.edit import FormView
 
-from .forms import ModuleFormSet, LessonFormSet, CourseFilterForm, CourseEnrollForm
-from .models import Course, Module, Content, Lesson
+from .forms import ModuleFormSet, LessonFormSet, CourseFilterForm, CourseEnrollForm, ReviewForm
+from .models import Course, Module, Content, Lesson, Review
 from .mixin import CreatorCourseMixin, CreatorCourseUpdateMixin
 
 class ManageCourseListView(CreatorCourseMixin, ListView):
@@ -269,3 +270,30 @@ class EnrollLessonDetailView(DetailView):
         context['module'] = self.get_object().module
         context['course'] = self.get_object().module.course
         return context
+
+
+class AddReviewView(LoginRequiredMixin, FormView):
+    template_name = 'course/add_review.html'
+    form_class = ReviewForm
+
+    def get_success_url(self):
+        return reverse('enroll_course_detail', kwargs={'pk': self.kwargs['course_id']})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['course'] = get_object_or_404(Course, id=self.kwargs['course_id'])
+        return context
+
+    def get_initial(self):
+        self.review, created = Review.objects.get_or_create(
+            course_id=self.kwargs['course_id'],
+            user=self.request.user,
+            defaults={'rating': 0}  # Set a default rating value
+        )
+        return {'rating': self.review.rating, 'comment': self.review.comment}
+
+    def form_valid(self, form):
+        self.review.rating = form.cleaned_data['rating']
+        self.review.comment = form.cleaned_data['comment']
+        self.review.save()
+        return super().form_valid(form)

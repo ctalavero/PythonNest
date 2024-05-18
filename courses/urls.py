@@ -24,6 +24,8 @@ urlpatterns = [
     path('enroll-detail/<int:pk>/module/<int:module_id>/', views.EnrollModuleDetailView.as_view(), name='enroll_module_detail'),
     path('enroll-detail/<int:pk>/module/<int:module_id>/lesson/<int:lesson_id>/', views.EnrollLessonDetailView.as_view(), name='enroll_lesson_detail'),
 
+    path('enroll-detail/<int:course_id>/review/', views.AddReviewView.as_view(), name='add_review'),
+
 
 
     path('<slug:slug>/', views.CourseDetailView.as_view(), name='course_detail'),

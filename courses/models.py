@@ -1,5 +1,7 @@
 from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+from django.db.models import Avg
 from django.template.loader import render_to_string
 from django.urls import reverse
 from taggit.managers import TaggableManager
@@ -33,6 +35,11 @@ class Course(models.Model):
 
     def get_absolute_url(self):
         return reverse('course_detail', args=[self.slug])
+
+    def update_rating(self):
+        avg_rating = self.reviews.aggregate(Avg('rating'))['rating__avg']
+        self.rating = avg_rating if avg_rating is not None else 0
+        self.save()
 
 class Module(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='modules')
@@ -109,3 +116,21 @@ class Content(models.Model):
 
     def __str__(self):
         return f'({self.order}:{self.pk}) {self.content_type.model}'
+
+class Review(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='reviews')
+    user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    rating = models.PositiveIntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)])
+    comment = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('course', 'user')
+
+    def __str__(self):
+        return f'{self.user} - {self.course} - {self.rating}'
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.course.update_rating()

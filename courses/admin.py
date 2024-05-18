@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from .models import Course, Module, Lesson, Content, Text, File, Image, Video
+from .models import Course, Module, Lesson, Content, Text, File, Image, Video, Review
+
 
 class ModuleInline(admin.StackedInline):
     model = Module
@@ -91,4 +92,11 @@ class ImageAdmin(admin.ModelAdmin):
 class VideoAdmin(admin.ModelAdmin):
     list_display = ('title', 'created_at', 'updated_at', 'url', 'file')
     search_fields = ('title', 'url')
+    readonly_fields = ('created_at', 'updated_at')
+
+@admin.register(Review)
+class ReviewAdmin(admin.ModelAdmin):
+    list_display = ('course', 'rating', 'comment', 'created_at')
+    list_filter = ('course', 'rating')
+    search_fields = ('course', 'rating')
     readonly_fields = ('created_at', 'updated_at')

@@ -2,7 +2,7 @@ from django import forms
 from django.forms.models import inlineformset_factory
 from taggit.models import Tag
 from django.core.exceptions import ValidationError
-from .models import Course, Module, Lesson, Content
+from .models import Course, Module, Lesson, Content, Review
 import re
 ModuleFormSet = inlineformset_factory(Course, Module, fields=['title', 'description','order'], extra=2, can_delete=True)
 LessonFormSet = inlineformset_factory(Module, Lesson, fields=['title', 'order',], extra=2, can_delete=True)
@@ -27,3 +27,12 @@ class CourseFilterForm(forms.Form):
 
 class CourseEnrollForm(forms.Form):
     course = forms.ModelChoiceField(queryset=Course.objects.all(), widget=forms.HiddenInput)
+
+class ReviewForm(forms.ModelForm):
+    class Meta:
+        model = Review
+        fields = ['rating', 'comment']
+        widgets = {
+            'rating': forms.NumberInput(attrs={'min': 0, 'max': 5}),
+            'comment': forms.Textarea(attrs={'rows': 5}),
+        }
