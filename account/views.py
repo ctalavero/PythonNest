@@ -7,15 +7,7 @@ from .form import UserRegistrationForm
 from django.core.mail import send_mail
 from django.urls import reverse_lazy
 
-def test(request):
-    send_mail(
-        'Subject here',
-        'test message.',
-        'ctalavero12@gmail.com',
-        ['ctalavero12@gmail.com'],
-        fail_silently=False,
-    )
-    return HttpResponse('test')
+
 
 @login_required
 def dashboard(request):
