@@ -25,7 +25,13 @@ class UserRegistrationForm(forms.ModelForm):
 class UserEditForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ('first_name', 'last_name')
+        fields = ('first_name', 'last_name','email')
+
+    def clean_email(self):
+        data = self.cleaned_data['email']
+        if User.objects.filter(email=data).exclude(id=self.instance.id).exists():
+            raise forms.ValidationError('Email already in use.')
+        return data
 
 class ProfileEditForm(forms.ModelForm):
     class Meta:
