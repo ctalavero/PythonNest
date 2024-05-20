@@ -2,6 +2,19 @@
 <p>Welcome to your dashboard.</p>
 <a href="{% url 'logout' %}">натисніть тут щоб вийти</a>
 <p>юзер {{ user.username }}</p>
+<p>email {{ user.email }}</p>
+<p>Ім'я {{ user.first_name }}</p>
+<p>Прізвище {{ user.last_name }}</p>
+{% if user.profile.date_of_birth %}
+    <p>Дата народження {{ user.profile.date_of_birth }}</p>
+{% endif %}
+{% if user.profile.photo %}
+    <p><img src="{{ user.profile.photo.url }}" alt="profile photo" height="60px"/></p>
+{% endif %}
+{% if user.profile.about %}
+    <p>Про мене: {{ user.profile.about }}</p>
+{% endif %}
+<a href="{% url 'edit' %}">Редагувати профіль</a>
 <br>
 {% if perms.courses.view_course %}
     <a href="{% url 'manage_course_list' %}">Редагувати курси</a>
