@@ -145,3 +145,8 @@ SERVER_EMAIL = EMAIL_HOST_USER
 EMAIL_ADMIN = EMAIL_HOST_USER
 
 GOOGLE_YOUTUBE_API_KEY = env.str('GOOGLE_YOUTUBE_API_KEY')
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'account.authentication.EmailAuthBackend',
+]
