@@ -1,12 +1,16 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.contrib.auth.models import User
+
+from account.storage import OverwriteStorage
+
+
 # Create your models here.
 
 class Profile(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE,related_name='profile')
     date_of_birth = models.DateField(blank=True,null=True)
-    photo = models.ImageField(upload_to='users/%Y/%m/%d',blank=True,default='logos/default_user_logo.jpg')
+    photo = models.ImageField(upload_to='users/%Y/%m/%d',blank=True,default='logos/default_user_logo.jpg',storage=OverwriteStorage())
     about = models.TextField(blank=True,null=True)
 
     def __str__(self):

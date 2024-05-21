@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.utils.text import slugify
 from taggit.managers import TaggableManager
 
+from account.storage import OverwriteStorage
 from courses.fields import OrderField
 
 
@@ -13,7 +14,7 @@ class Article(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='articles')
     title = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255, unique=True)
-    logo = models.ImageField(upload_to='logos', blank=True, null=True, default='logos/course-logo-default.jpg')
+    logo = models.ImageField(upload_to='logos', blank=True, null=True, default='logos/course-logo-default.jpg',storage=OverwriteStorage())
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     tags = TaggableManager()

@@ -8,6 +8,8 @@ from django.db.models import Avg
 from django.template.loader import render_to_string
 from django.urls import reverse
 from taggit.managers import TaggableManager
+
+from account.storage import OverwriteStorage
 from .fields import OrderField
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -21,7 +23,7 @@ class Course(models.Model):
     published = models.BooleanField(default=False)
     title = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255, unique=True)
-    logo = models.ImageField(upload_to='logos', blank=True, null=True, default='logos/course-logo-default.jpg')
+    logo = models.ImageField(upload_to='logos', blank=True, null=True, default='logos/course-logo-default.jpg',storage=OverwriteStorage())
     description = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     tags = TaggableManager()
@@ -92,14 +94,14 @@ class Text(ItemABS):
     content = models.TextField()
 
 class File(ItemABS):
-    file = models.FileField(upload_to='files')
+    file = models.FileField(upload_to='files',storage=OverwriteStorage())
 
 class Image(ItemABS):
-    file = models.FileField(upload_to='images')
+    file = models.FileField(upload_to='images',storage=OverwriteStorage())
 
 class Video(ItemABS):
     url = models.URLField(blank=True, null=True)
-    file = models.FileField(upload_to='videos', blank=True, null=True)
+    file = models.FileField(upload_to='videos', blank=True, null=True,storage=OverwriteStorage())
     duration = models.DurationField(blank=True, null=True)
 
     def clean(self):
