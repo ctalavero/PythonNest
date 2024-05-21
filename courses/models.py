@@ -16,8 +16,6 @@ from django.conf import settings
 from .functions import get_video_id_from_url, get_youtube_video_duration, get_video_duration
 
 
-# Create your models here.
-
 class Course(models.Model):
     created_by = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='courses_created')
     published = models.BooleanField(default=False)
@@ -151,7 +149,7 @@ class Lesson(models.Model):
 
 class Content(models.Model):
     lesson = models.ForeignKey(Lesson, related_name='contents',on_delete=models.CASCADE)
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, limit_choices_to={'model__in': ('text', 'video', 'image', 'file')})
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, limit_choices_to={'model__in': ('text', 'video', 'image', 'file')}, related_name='course_contents')
     object_id = models.PositiveIntegerField()
     item = GenericForeignKey('content_type', 'object_id')
 

@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'taggit',
     'django.contrib.postgres',
     'embed_video',
+    'articles.apps.ArticlesConfig',
 ]
 
 MIDDLEWARE = [

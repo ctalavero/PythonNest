@@ -1,0 +1,11 @@
+<h1>Manage Articles</h1>
+<a href="{% url 'articles:article_create' %}">Create New Article</a>
+{% for article in object_list %}
+{% if article.image %}
+  <img src="{{ article.image.url }}" alt="{{ article.title }}" height="60px"/>
+{% endif %}
+<h2>{{ article.title }}</h2>
+<a href="{% url 'articles:article_update' article.id %}">Edit</a>
+<a href="{% url 'articles:manage_article_content_list' article.id %}" >Manage Content</a>
+
+{% endfor %}

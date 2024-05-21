@@ -1,0 +1,26 @@
+{% load course %}
+<h1>Manage Content for {{ article.title }}</h1>
+
+
+{% for content in object_list %}
+
+    {% with item=content.item %}
+        <p>{{ item.title }} ({{ item|model_name }})</p>
+        <a href="{% url "articles:content_update" article.id item|model_name item.id %}">Змінити</a>
+        <form action="{% url "articles:content_delete" content.id %}" method="post">
+            <input type="submit" value="Delete">
+            <input type="hidden" name="article_id" value="{{article.id}}">
+            {% csrf_token %}
+        </form>
+    {% endwith %}
+    <a href="#" class="btn btn-secondary">Edit</a>
+    <a href="#" class="btn btn-danger">Delete</a>
+
+{% endfor %}
+<h3 href="#" >Add New Content</h3>
+<ul>
+    <li><a href="{% url "articles:content_create" article.id "text" %}">Текст</a></li>
+    <li><a href="{% url "articles:content_create" article.id "video" %}">Відео</a></li>
+    <li><a href="{% url "articles:content_create" article.id "image" %}">Зображення</a></li>
+    <li><a href="{% url "articles:content_create" article.id "file" %}">Файл</a></li>
+</ul>

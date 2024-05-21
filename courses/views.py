@@ -289,7 +289,7 @@ class AddReviewView(LoginRequiredMixin, FormView):
         self.review, created = Review.objects.get_or_create(
             course_id=self.kwargs['course_id'],
             user=self.request.user,
-            defaults={'rating': 0}  # Set a default rating value
+            defaults={'rating': 0}
         )
         return {'rating': self.review.rating, 'comment': self.review.comment}
 
