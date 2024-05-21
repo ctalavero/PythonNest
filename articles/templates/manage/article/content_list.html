@@ -1,4 +1,5 @@
 {% load course %}
+<a href="{% url "articles:manage_article_list" %}">Back to Articles</a>
 <h1>Manage Content for {{ article.title }}</h1>
 
 
@@ -13,9 +14,6 @@
             {% csrf_token %}
         </form>
     {% endwith %}
-    <a href="#" class="btn btn-secondary">Edit</a>
-    <a href="#" class="btn btn-danger">Delete</a>
-
 {% endfor %}
 <h3 href="#" >Add New Content</h3>
 <ul>

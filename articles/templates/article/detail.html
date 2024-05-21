@@ -1,0 +1,19 @@
+<h1>{{ object.title }}</h1>
+<p>{{ object.description }}</p>
+<p>Author: {{ object.author }}</p>
+<p>Created at: {{ object.created_at }}</p>
+<p>Updated at: {{ object.updated_at }}</p>
+
+<h2>Contents:</h2>
+{% if contents %}
+<ul>
+{% for content in contents %}
+  <li>
+    <p>{{ content.item.title }}</p>
+    <p>{{ content.item.render }}</p>
+  </li>
+{% endfor %}
+</ul>
+{% else %}
+<p>No contents for this article.</p>
+{% endif %}

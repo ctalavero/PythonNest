@@ -3,6 +3,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
+from django.utils.text import slugify
 from taggit.managers import TaggableManager
 
 from courses.fields import OrderField
@@ -23,6 +24,11 @@ class Article(models.Model):
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
 
 class Content(models.Model):
     article = models.ForeignKey(Article, related_name='contents', on_delete=models.CASCADE)

@@ -1,0 +1,17 @@
+<h1>Articles</h1>
+<form method="get" action=".">
+{{ form.as_p }}
+<button type="submit" class="btn btn-primary">Filter</button>
+<button type="button" onclick="window.location='?';">Очистити</button>
+</form>
+<ul class="article-list">
+{% for article in articles %}
+  <li>
+    <p><a href="{% url 'articles:article_detail' article.id %}">{{ article.title }}</a></p>
+    <img src="{{ article.author.profile.photo.url }}" alt="User photo" height="30">
+    <p>Created by: {{ article.author.username }}</p>
+    <p>Created at: {{ article.created_at }}</p>
+    <p>Tags: {{ article.tags.all|join:", " }}</p>
+  </li>
+{% endfor %}
+</ul>

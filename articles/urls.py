@@ -13,4 +13,6 @@ urlpatterns = [
     path('article/<int:article_id>/content/<model_name>/<id>/', views.ArcticleContentCreateUpdateView.as_view(),
          name='content_update'),
     path('article-content/<int:id>/delete/', views.ArticleContentDeleteView.as_view(), name='content_delete'),
+    path('articles/', views.ArticleListView.as_view(), name='article_list'),
+    path('articles/<int:pk>/', views.ArticleDetailView.as_view(), name='article_detail'),
 ]

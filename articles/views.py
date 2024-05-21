@@ -1,10 +1,12 @@
 from django.apps import apps
+from django.contrib.postgres.search import TrigramSimilarity
 from django.forms import modelform_factory
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
-from django.views.generic import ListView, CreateView, UpdateView
+from django.views.generic import ListView, CreateView, UpdateView, DetailView
 from django.views.generic.base import TemplateResponseMixin, View
 
+from .forms import ArticleFilterForm
 from .mixin import isAuthorMixin, AuthorEditMixin, AuthorArticleMixin, AuthorArticleUpdateMixin
 from .models import Article, Content
 
@@ -84,3 +86,43 @@ class ArticleContentDeleteView(isAuthorMixin, View):
         return redirect('articles:manage_article_content_list', pk=article.id)
 
 
+
+
+class ArticleListView(TemplateResponseMixin, View):
+    model = Article
+    template_name = 'article/list.html'
+
+    def get(self, request):
+        form = ArticleFilterForm(request.GET)
+        articles = self.model.objects.filter(published=True)
+
+        if form.is_valid():
+            tags = form.cleaned_data.get('tags')
+            article_name = form.cleaned_data.get('article_name')
+            date_from = form.cleaned_data.get('date_from')
+            date_to = form.cleaned_data.get('date_to')
+
+            if tags:
+                tags = [tag.name.lower() for tag in tags]
+                articles = articles.filter(tags__name__iregex=r'(' + '|'.join(tags) + ')').distinct()
+            if article_name:
+                articles = articles.annotate(tittle_semilar=TrigramSimilarity('title', article_name)).filter(tittle_semilar__gt=0.1).order_by('-tittle_semilar')
+            if date_from:
+                articles = articles.filter(updated_at__gte=date_from)
+            if date_to:
+                articles = articles.filter(updated_at__lte=date_to)
+        context = {
+            'articles': articles,
+            'form': form
+        }
+
+        return self.render_to_response(context)
+
+class ArticleDetailView(DetailView):
+    model = Article
+    template_name = 'article/detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['contents'] = self.object.contents.all()
+        return context
