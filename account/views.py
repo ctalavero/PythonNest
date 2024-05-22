@@ -1,12 +1,15 @@
+from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LogoutView
+from django.views.generic import DetailView
+
 from .form import UserRegistrationForm, UserEditForm, ProfileEditForm
 from django.core.mail import send_mail
 from django.urls import reverse_lazy
-from .models import Profile
+from .models import Profile, Contact
 
 
 @login_required
@@ -57,3 +60,44 @@ def edit_profile(request):
         'profile_form': profile_form
     })
 
+@login_required
+@require_POST
+def user_follow(request):
+    user_id = request.POST.get('id')
+    action = request.POST.get('action')
+    next_url = request.POST.get('next', 'articles:article_list')
+    if user_id and action and request.user.id != user_id:
+        try:
+            user = User.objects.get(id=user_id)
+            if action == 'follow':
+                Contact.objects.get_or_create(user_from=request.user, user_to=user)
+            elif action == 'unfollow':
+                Contact.objects.filter(user_from=request.user, user_to=user).delete()
+            return redirect(next_url)
+        except User.DoesNotExist:
+            return redirect(next_url)
+    return redirect(next_url)
+
+class UserDetailView(DetailView):
+    model = User
+    template_name = 'account/user_detail.html'
+    context_object_name = 'user'
+    slug_field = 'username'
+    slug_url_kwarg = 'username'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.get_object()
+        context['followers_count'] = user.followers.count()
+        context['following_count'] = user.following.count()
+        return context
+
+def followers_list(request, user_pk):
+    user = User.objects.get(pk=user_pk)
+    followers = user.followers.all()
+    return render(request, 'htmx/followers_list.html', {'followers': followers})
+
+def following_list(request, user_pk):
+    user = User.objects.get(pk=user_pk)
+    following = user.following.all()
+    return render(request, 'htmx/following_list.html', {'following': following})

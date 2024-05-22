@@ -1,0 +1,7 @@
+<ul>
+  {% for follower in followers %}
+    <li><a href="{% url 'user_detail' follower.username %}">{{ follower.username }}</a></li>
+  {% empty %}
+    <li>No followers yet.</li>
+  {% endfor %}
+</ul>

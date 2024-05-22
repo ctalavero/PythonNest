@@ -9,8 +9,8 @@
 {% for article in articles %}
   <li>
     <p><a href="{% url 'articles:article_detail' article.id %}">{{ article.title }}</a></p>
-    <img src="{{ article.author.profile.photo.url }}" alt="User photo" height="30">
-    <p>Created by: {{ article.author.username }}</p>
+    <a href="{% url 'user_detail' article.author.username %}"><img src="{{ article.author.profile.photo.url }}" alt="User photo" height="30"></a>
+    <p>Created by: <a href="{% url 'user_detail' article.author.username %}">{{ article.author.username }}</a></p>
     <p>Created at: {{ article.created_at }}</p>
     <p>Tags: {{ article.tags.all|join:", " }}</p>
   </li>

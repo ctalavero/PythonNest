@@ -1,0 +1,30 @@
+
+<h1>{{ user.username }}</h1>
+<p><img src="{{ user.profile.photo.url }}" alt="User photo" height="80"></p>
+<p>Followers: {{ followers_count }}</p>
+<p>Following: {{ following_count }}</p>
+
+{% if user != request.user %}
+    <form action="{% url 'user_follow' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="id" value="{{ user.id }}">
+        {% if request.user in user.followers.all %}
+            <input type="hidden" name="action" value="unfollow">
+            <button type="submit">Unfollow</button>
+        {% else %}
+            <input type="hidden" name="action" value="follow">
+            <button type="submit">Follow</button>
+        {% endif %}
+        <input type="hidden" name="next" value="{% url 'user_detail' user.username %}">
+    </form>
+{% endif %}
+
+<h2 hx-get="{% url 'followers_list' user.pk %}" hx-target="#followers" hx-swap="outerHTML">Followers</h2>
+<div id="followers"></div>
+
+
+<h2 hx-get="{% url 'following_list' user.pk %}" hx-target="#following" hx-swap="outerHTML">Following</h2>
+<div id="following"></div>
+
+
+<script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
