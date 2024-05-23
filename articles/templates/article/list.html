@@ -1,18 +1,27 @@
 <a href="{% url 'dashboard' %}">Dashboard</a>
 <h1>Articles</h1>
+<div class="wrapper">
 <form method="get" action=".">
-{{ form.as_p }}
-<button type="submit" class="btn btn-primary">Filter</button>
-<button type="button" onclick="window.location='?';">Очистити</button>
+  {{ form.as_p }}
+  <button type="submit" class="btn btn-primary">Filter</button>
+  <button type="button" onclick="window.location='?';">Очистити</button>
 </form>
-<ul class="article-list">
-{% for article in articles %}
-  <li>
-    <p><a href="{% url 'articles:article_detail' article.id %}">{{ article.title }}</a></p>
-    <a href="{% url 'user_detail' article.author.username %}"><img src="{{ article.author.profile.photo.url }}" alt="User photo" height="30"></a>
-    <p>Created by: <a href="{% url 'user_detail' article.author.username %}">{{ article.author.username }}</a></p>
-    <p>Created at: {{ article.created_at }}</p>
-    <p>Tags: {{ article.tags.all|join:", " }}</p>
-  </li>
-{% endfor %}
+
+<button hx-get="{% url 'articles:subscribed_articles' %}" hx-target=".wrapper" hx-swap="outerHTML">
+  Show Subscribed Articles
+</button>
+
+
+<ul id="article-list" class="article-list">
+  {% for article in articles %}
+    <li>
+      <p><a href="{% url 'articles:article_detail' article.id %}">{{ article.title }}</a></p>
+      <a href="{% url 'user_detail' article.author.username %}"><img src="{{ article.author.profile.photo.url }}" alt="User photo" height="30"></a>
+      <p>Created by: <a href="{% url 'user_detail' article.author.username %}">{{ article.author.username }}</a></p>
+      <p>Created at: {{ article.created_at }}</p>
+      <p>Tags: {{ article.tags.all|join:", " }}</p>
+    </li>
+  {% endfor %}
 </ul>
+<script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
+</div>

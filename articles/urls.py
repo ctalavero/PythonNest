@@ -15,4 +15,9 @@ urlpatterns = [
     path('article-content/<int:id>/delete/', views.ArticleContentDeleteView.as_view(), name='content_delete'),
     path('articles/', views.ArticleListView.as_view(), name='article_list'),
     path('articles/<int:pk>/', views.ArticleDetailView.as_view(), name='article_detail'),
+
 ]
+
+urlpatterns += [
+    path('subscribed/', views.SubscribedArticlesView.as_view(), name='subscribed_articles'),
+    ]

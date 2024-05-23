@@ -1,4 +1,5 @@
 from django.apps import apps
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.postgres.search import TrigramSimilarity
 from django.forms import modelform_factory
 from django.shortcuts import render, get_object_or_404, redirect
@@ -6,7 +7,7 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DetailView
 from django.views.generic.base import TemplateResponseMixin, View
 
-from .forms import ArticleFilterForm
+from .forms import ArticleFilterForm, FollowUserForm
 from .mixin import isAuthorMixin, AuthorEditMixin, AuthorArticleMixin, AuthorArticleUpdateMixin
 from .models import Article, Content
 
@@ -98,6 +99,7 @@ class ArticleListView(TemplateResponseMixin, View):
 
         if form.is_valid():
             tags = form.cleaned_data.get('tags')
+            #print(*tags[0].name)
             article_name = form.cleaned_data.get('article_name')
             date_from = form.cleaned_data.get('date_from')
             date_to = form.cleaned_data.get('date_to')
@@ -125,4 +127,28 @@ class ArticleDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['contents'] = self.object.contents.all()
+        return context
+
+class SubscribedArticlesView(LoginRequiredMixin, ListView):
+    model = Article
+    template_name = 'article/subscribed_articles.html'
+    context_object_name = 'articles'
+
+    def get_queryset(self):
+        user = self.request.user
+        following_ids = user.following.values_list('id', flat=True)
+
+        if self.request.GET.get('follow_users'):
+            form = FollowUserForm(self.request.GET, user=user)
+            if form.is_valid():
+                following_ids = form.cleaned_data['following_users']
+                self.form = form
+        else:
+            self.form = FollowUserForm(user=user)
+
+        return Article.objects.filter(author_id__in=following_ids, published=True)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = self.form
         return context

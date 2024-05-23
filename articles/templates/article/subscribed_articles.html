@@ -1,0 +1,20 @@
+<div id="article-list">
+  <form hx-get="{% url 'articles:subscribed_articles' %}" hx-target="#article-list" hx-swap="outerHTML"'>
+    {{ form.as_p}}
+    {% csrf_token %}
+    <input type="hidden" name="follow_users" value="true">
+    <button type="submit">Filter</button>
+</form>
+  <ul class="article-list">
+    {% for article in articles %}
+    <li>
+      <p><a href="{% url 'articles:article_detail' article.id %}">{{ article.title }}</a></p>
+      <a href="{% url 'user_detail' article.author.username %}"><img src="{{ article.author.profile.photo.url }}"
+                                                                     alt="User photo" height="30"></a>
+      <p>Created by: <a href="{% url 'user_detail' article.author.username %}">{{ article.author.username }}</a></p>
+      <p>Created at: {{ article.created_at }}</p>
+      <p>Tags: {{ article.tags.all|join:", " }}</p>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
