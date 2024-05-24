@@ -1,5 +1,5 @@
 {% load static %}
-
+{% load course %}
 <h1>Список курсів</h1>
 <a href="{% url 'dashboard' %}">Back to Dashboard</a>
 <br>
@@ -26,7 +26,7 @@
                 {% endfor %}
             </p>
             <p>Rating: {{ course.rating }}</p>
-            <p>Passage Time: {{ course.passage_time }}</p>
+            <p>Passage Time: {{ course.passage_time|format_duration }}</p>
             <p><a href="{{ course.get_absolute_url }}">Перейти до курсу</a></p>
         </li>
     {% empty %}
