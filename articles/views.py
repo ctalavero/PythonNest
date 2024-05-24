@@ -99,7 +99,6 @@ class ArticleListView(TemplateResponseMixin, View):
 
         if form.is_valid():
             tags = form.cleaned_data.get('tags')
-            #print(*tags[0].name)
             article_name = form.cleaned_data.get('article_name')
             date_from = form.cleaned_data.get('date_from')
             date_to = form.cleaned_data.get('date_to')
@@ -137,16 +136,30 @@ class SubscribedArticlesView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         user = self.request.user
         following_ids = user.following.values_list('id', flat=True)
+        articles = Article.objects.filter(author_id__in=following_ids, published=True)
+        self.form = FollowUserForm(user=user)
 
         if self.request.GET.get('follow_users'):
             form = FollowUserForm(self.request.GET, user=user)
             if form.is_valid():
                 following_ids = form.cleaned_data['following_users']
-                self.form = form
-        else:
-            self.form = FollowUserForm(user=user)
+                tags = form.cleaned_data.get('tags')
+                article_name = form.cleaned_data.get('article_name')
+                date_from = form.cleaned_data.get('date_from')
+                date_to = form.cleaned_data.get('date_to')
 
-        return Article.objects.filter(author_id__in=following_ids, published=True)
+                if tags:
+                    tags = [tag.name.lower() for tag in tags]
+                    articles = articles.filter(tags__name__iregex=r'(' + '|'.join(tags) + ')').distinct()
+                if article_name:
+                    articles = articles.annotate(tittle_semilar=TrigramSimilarity('title', article_name)).filter(
+                        tittle_semilar__gt=0.1).order_by('-tittle_semilar')
+                if date_from:
+                    articles = articles.filter(updated_at__gte=date_from)
+                if date_to:
+                    articles = articles.filter(updated_at__lte=date_to)
+                self.form = form
+        return articles
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

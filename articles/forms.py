@@ -18,7 +18,7 @@ class ArticleFilterForm(forms.Form):
     date_from = forms.DateField(required=False, label='Дата від', widget=DateInput())
     updated_at = forms.DateField(required=False, label='Дата до', widget=DateInput())
 
-class FollowUserForm(forms.Form):
+class FollowUserForm(ArticleFilterForm):
     following_users = forms.ModelMultipleChoiceField(
         queryset=User.objects.all(),
         required=False,
