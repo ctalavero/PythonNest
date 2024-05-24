@@ -1,4 +1,6 @@
 from django.urls import path
+from django.views.generic import TemplateView
+
 from . import views
 from  django.contrib.auth import views as auth_views
 
@@ -18,6 +20,9 @@ urlpatterns = [
     path('edit/',views.edit_profile,name='edit'),
     path('follow/', views.user_follow, name='user_follow'),
     path('profile/<str:username>/', views.UserDetailView.as_view(), name='user_detail'),
+    path('request-access/', views.AccessRequestView.as_view(), name='request_access'),
+    path('access-granted/', TemplateView.as_view(template_name='account/access_granted.html'), name='access_granted'),
+    path('access-denied/', TemplateView.as_view(template_name='account/access_denied.html'), name='access_denied'),
 ]
 
 urlpatterns += [

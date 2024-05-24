@@ -24,3 +24,7 @@
 <br>
 <a href="{% url 'articles:manage_article_list' %}">Мої статті</a>
 <p><a href="{% url 'articles:article_list' %}">Список всіх статей</a></p>
+<br>
+{% if not permissions %}
+    <p><a href="{% url 'request_access' %}">Отримати дозвіл на створення контенту</a></p>
+{% endif %}

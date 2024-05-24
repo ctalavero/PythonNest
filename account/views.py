@@ -1,12 +1,15 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import User, Group
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LogoutView
-from django.views.generic import DetailView
-
-from .form import UserRegistrationForm, UserEditForm, ProfileEditForm
+from django.views.generic import DetailView, FormView
+from django.utils import timezone
+from datetime import timedelta
+from django.contrib.auth.models import Group
+from .form import UserRegistrationForm, UserEditForm, ProfileEditForm, AccessRequestForm
 from django.core.mail import send_mail
 from django.urls import reverse_lazy
 from .models import Profile, Contact
@@ -14,7 +17,15 @@ from .models import Profile, Contact
 
 @login_required
 def dashboard(request):
-    return render(request, 'account/dashboard.html')
+    permissions = False
+    if request.user.is_superuser:
+        permissions = True
+    else:
+        group_names = request.user.groups.filter(name__in=['Articles Admins', 'Course Admins']).values_list('name', flat=True)
+        if len(group_names) == len(Group.objects.values_list('name', flat=True)) :
+            permissions = True
+
+    return render(request, 'account/dashboard.html', {'permissions': permissions})
 
 class CustomLogoutView(LogoutView):
     @classmethod
@@ -53,6 +64,8 @@ def edit_profile(request):
             return redirect(reverse_lazy('dashboard'))
     else:
         user_form = UserEditForm(instance=request.user)
+        if not hasattr(request.user, 'profile'):
+            Profile.objects.create(user=request.user)
         profile_form = ProfileEditForm(instance=request.user.profile)
 
     return render(request, 'account/edit_profile.html', {
@@ -101,3 +114,34 @@ def following_list(request, user_pk):
     user = User.objects.get(pk=user_pk)
     following = user.following.all()
     return render(request, 'htmx/following_list.html', {'following': following})
+
+class AccessRequestView(LoginRequiredMixin, FormView):
+    template_name = 'account/request_access.html'
+    form_class = AccessRequestForm
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    def form_valid(self, form):
+        user = self.request.user
+        if user.date_joined < timezone.now() - timedelta(weeks=3): # user joined more than 3 weeks ago or 2 days ago for testing
+            access_types = form.cleaned_data.get('access_types')
+            group_names = {
+                'article': 'Articles Admins',
+                'course': 'Course Admins'
+            }
+            for access_type in access_types:
+                group_name = group_names.get(access_type)
+                if group_name:
+                    group, created = Group.objects.get_or_create(name=group_name)
+                    user.groups.add(group)
+            user.is_staff = True
+            user.save()
+            return redirect('access_granted')
+        else:
+            return redirect('access_denied')
+
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form))

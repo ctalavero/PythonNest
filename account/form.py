@@ -37,3 +37,27 @@ class ProfileEditForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = ('date_of_birth', 'photo', 'about')
+
+
+class AccessRequestForm(forms.Form):
+    access_types = forms.MultipleChoiceField(
+        choices=[],
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+        label='Виберіть доступ'
+    )
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        if user:
+            all_access_choices = [
+                ('article', 'Створювати статті'),
+                ('course', 'Створювати курси')
+            ]
+            missing_permissions = []
+            if not user.groups.filter(name='Articles Admins').exists():
+                missing_permissions.append(('article', 'Створювати статті'))
+            if not user.groups.filter(name='Course Admins').exists():
+                missing_permissions.append(('course', 'Створювати курси'))
+            self.fields['access_types'].choices = missing_permissions
