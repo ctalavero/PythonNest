@@ -1,9 +1,8 @@
 from datetime import timedelta
 
-from django.contrib.auth.decorators import login_required
-from django.contrib.postgres.search import SearchVector, TrigramSimilarity
-from django.db.models import Q, F
-from taggit.models import Tag
+from django.core.cache import cache
+from django.contrib.postgres.search import  TrigramSimilarity
+from django.db.models import F
 from django.apps import apps
 from django.forms import modelform_factory, modelformset_factory
 from django.shortcuts import render, get_object_or_404, redirect
@@ -140,33 +139,44 @@ class CourseListView(TemplateResponseMixin, View):
 
     def get(self, request):
         form = CourseFilterForm(request.GET)
-        courses = self.model.objects.all().filter(published=True)
+        cache_key = self._generate_cache_key(request.GET)
 
-        if form.is_valid():
-            tags = form.cleaned_data.get('tags')
-            rating = form.cleaned_data.get('rating')
-            passage_time = form.cleaned_data.get('passage_time')
-            course_name = form.cleaned_data.get('course_name')
 
-            if tags:
-                tags = [tag.name.lower() for tag in tags]
-                courses = courses.filter(tags__name__iregex=r'(' + '|'.join(tags) + ')').distinct()
+        cached_courses = cache.get(cache_key)
 
-            if rating:
-                courses = courses.filter(rating__gte=rating)
+        if cached_courses:
+            courses = cached_courses
+        else:
+            courses = self.model.objects.all().filter(published=True)
 
-            if passage_time:
-                hours, minutes, seconds = map(int, passage_time.split(':'))
-                passage_time = timedelta(hours=hours, minutes=minutes, seconds=seconds)
-                courses = courses.filter(passage_time__lte=passage_time)
+            if form.is_valid():
+                tags = form.cleaned_data.get('tags')
+                rating = form.cleaned_data.get('rating')
+                passage_time = form.cleaned_data.get('passage_time')
+                course_name = form.cleaned_data.get('course_name')
 
-            if course_name:
-                courses = courses.annotate(
-                    title_similarity=TrigramSimilarity('title', course_name),
-                    description_similarity=TrigramSimilarity('description', course_name),
-                ).annotate(
-                    total_similarity=F('title_similarity') + F('description_similarity')
-                ).filter(total_similarity__gt=0.1).order_by('-total_similarity')
+                if tags:
+                    tags = [tag.name.lower() for tag in tags]
+                    courses = courses.filter(tags__name__iregex=r'(' + '|'.join(tags) + ')').distinct()
+
+                if rating:
+                    courses = courses.filter(rating__gte=rating)
+
+                if passage_time:
+                    hours, minutes, seconds = map(int, passage_time.split(':'))
+                    passage_time = timedelta(hours=hours, minutes=minutes, seconds=seconds)
+                    courses = courses.filter(passage_time__lte=passage_time)
+
+                if course_name:
+                    courses = courses.annotate(
+                        title_similarity=TrigramSimilarity('title', course_name),
+                        description_similarity=TrigramSimilarity('description', course_name),
+                    ).annotate(
+                        total_similarity=F('title_similarity') + F('description_similarity')
+                    ).filter(total_similarity__gt=0.1).order_by('-total_similarity')
+
+
+            cache.set(cache_key, courses, 300)
 
         context = {
             'courses': courses,
@@ -174,6 +184,10 @@ class CourseListView(TemplateResponseMixin, View):
         }
 
         return self.render_to_response(context)
+
+    def _generate_cache_key(self, query_params):
+        items = sorted(query_params.items())
+        return 'courses_list_' + '_'.join(f'{key}={value}' for key, value in items)
 
 class CourseDetailView(DetailView):
     model = Course

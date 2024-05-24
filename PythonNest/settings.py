@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'django.contrib.postgres',
     'embed_video',
     'articles.apps.ArticlesConfig',
+    'redisboard',
 ]
 
 MIDDLEWARE = [
@@ -151,3 +152,13 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'account.authentication.EmailAuthBackend',
 ]
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
+}
